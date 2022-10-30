@@ -5,8 +5,11 @@
 ### How started and to learn
 https://divrhino.com/articles/build-command-line-tool-go-cobra/
 
-* snap install po
+* sudo apt update
+* sudo apt-get install build-essential
+* snap install go
 * edit .profile
+* go install -v golang.org/x/tools/gopls@latest
 * go install github.com/spf13/cobra-cli@latest
 * go mod init github.com/FinarxGmbH/harvest-cli
 * cobra-cli init --viper

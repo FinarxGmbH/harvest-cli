@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -59,6 +60,6 @@ func PostMcpResponse(baseAPI string, body string, authToken string) []byte {
 	if err != nil {
 		log.Printf("Could not read response body. %v", err)
 	}
-
+	fmt.Println("response:" + string(responseBytes))
 	return responseBytes
 }

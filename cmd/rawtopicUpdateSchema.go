@@ -49,7 +49,7 @@ type McpUpdateSchemaResponse struct {
 
 func doMcpUpdateSchema(domainname string, major string) {
 	//fmt.Println("Get random dad joke :P")
-	url := mcpHost + "update-schema"
+	url := mcpHost + "schema-update"
 
 	request := McpUpdateSchemaRequest{
 		SystemCategory: "core",
