@@ -5,6 +5,7 @@ Copyright © 2022 NAME HERE <EMAIL ADDRESS>
 package cmd
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -13,8 +14,9 @@ import (
 
 var (
 	// Used for flags.
-	cfgFile     string
-	userLicense string
+	cfgFile   string
+	mcpHost   string
+	authToken string
 
 	// see https://github.com/spf13/cobra-cli/blob/main/README.md for adding new commands
 
@@ -63,6 +65,7 @@ func Execute() {
 }
 
 func init() {
+	cobra.OnInitialize(initConfig)
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
@@ -73,12 +76,34 @@ func init() {
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("verbose", "v", false, "Generate verbose output what is going on")
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
-	rootCmd.PersistentFlags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
-	rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "name of license for the project")
-	rootCmd.PersistentFlags().Bool("viper", true, "use Viper for configuration")
-	viper.BindPFlag("author", rootCmd.PersistentFlags().Lookup("author"))
-	viper.BindPFlag("useViper", rootCmd.PersistentFlags().Lookup("viper"))
-	viper.SetDefault("author", "NAME HERE <EMAIL ADDRESS>")
-	viper.SetDefault("license", "apache")
+	rootCmd.PersistentFlags().StringVarP(&mcpHost, "mcpHost", "m", "http://localhost:7878/", "Host adress for Master Control Program of the cluster")
+	rootCmd.PersistentFlags().StringVarP(&authToken, "authToken", "a", "somesecrettoken", "Secret token to access Master Control Program of the cluster")
+	//rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "name of license for the project")
+	//rootCmd.PersistentFlags().Bool("viper", true, "use Viper for configuration")
+	viper.BindPFlag("mcpHost", rootCmd.PersistentFlags().Lookup("mcpHost"))
+	viper.BindPFlag("authToken", rootCmd.PersistentFlags().Lookup("authToken"))
+	//viper.BindPFlag("viper", rootCmd.PersistentFlags().Lookup("viper"))
+	viper.SetDefault("authToken", "somesecrettoken")
+}
+
+func initConfig() {
+	if cfgFile != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(cfgFile)
+	} else {
+		// Find home directory.
+		home, err := os.UserHomeDir()
+		cobra.CheckErr(err)
+
+		// Search config in home directory with name ".harvest/cli" (without extension).
+		viper.AddConfigPath(home + "/.harvest")
+		viper.SetConfigType("yaml")
+		viper.SetConfigName("cli")
+	}
+
+	viper.AutomaticEnv()
+
+	if err := viper.ReadInConfig(); err == nil {
+		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
 }
